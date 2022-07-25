@@ -1,10 +1,1 @@
-container:
-  image: cirrusci/android-sdk:18
-  cpu: 8
-  memory: 32G
 
-check_android_task:
-  Build: >
-    wget https://raw.githubusercontent.com/Headache01/rom_script/main/build_havoc.sh
-    chmod +x build_havoc.sh
-    ./build_havoc.sh
