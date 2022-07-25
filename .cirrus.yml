@@ -1,1 +1,21 @@
+env: # Environt variable to pass to all tasks
+    CIRRUS_CLONE_DEPTH: 1 # No need to clone with whole history
+    CIRRUS_WORKING_DIR: "/tmp/ci" # Where to clone repo
 
+task:
+    name: havoc # Project name
+    timeout_in: 120m # Otherwise it will timeout at 60m automatically, 120m highest in free account
+    container:
+      image: ubuntu:focal # It has built in setup environment + repo, aria2, rclone, pigz, username ci, and email ci@ci.ci [You can use your own docker image if you want, or you can use this one too!]
+      cpu: 10  #8 cpu for dummy build, 10 or more cpu for final build, sometimes more than 8 cpu will cause a timelock, so you wont be able to run ci again within few hours, in build script use -j8 or -j10 depending what you used here, otherwise low memory issue will happen, 16cpu highest
+      memory: 24G # So that we can have ram when needed, 24G highest
+    install_reqs: # To sync source
+      - apt install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python python3 jq
+    download_ccache_background_script: # To download ccache in background
+      - ./download_ccache # Ccache download script
+    sync_script: # To sync source
+      - ./sync # Source sync script
+    monitor_background_script: # To monitor ccache and machine status every minute, runs in background
+      - ./monitor # Monitor script
+    build_script: # Actual build script foreground
+      - ./build # Build script to run
